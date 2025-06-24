@@ -1,3 +1,4 @@
+-- Create Orders table
 CREATE TABLE dbo.Orders (
     OrderID INT PRIMARY KEY,
     CustomerID NVARCHAR(50),
@@ -5,7 +6,8 @@ CREATE TABLE dbo.Orders (
     UpdatedDate DATETIME,
     Amount FLOAT
 );
-select * from dbo.Orders;
+
+-- Create Temp_Orders table
 CREATE TABLE dbo.temp_Orders (
     OrderID INT ,
     CustomerID NVARCHAR(50),
@@ -14,32 +16,43 @@ CREATE TABLE dbo.temp_Orders (
     Amount FLOAT
 );
 
-select * from dbo.temp_Orders;
 
-ALTER PROCEDURE sp_upsert_orders
+CREATE OR ALTER PROCEDURE sp_upsert_orders
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Get latest UpdatedDate per OrderID
-    WITH RankedOrders AS (
-        SELECT *,
-               ROW_NUMBER() OVER (PARTITION BY OrderID ORDER BY UpdatedDate DESC) AS rn
-        FROM dbo.temp_Orders
+    -- Use latest UpdatedDate per OrderID from temp_Orders
+    WITH LatestTempOrders AS (
+        SELECT *
+        FROM (
+            SELECT *,
+                   ROW_NUMBER() OVER (PARTITION BY OrderID ORDER BY UpdatedDate DESC) AS rn
+            FROM dbo.temp_Orders
+        ) Ranked
+        WHERE rn = 1
     )
-    
-    MERGE dbo.Orders AS Target
-    USING (SELECT * FROM RankedOrders WHERE rn = 1) AS Source
-    ON Target.OrderID = Source.OrderID
 
+    MERGE INTO dbo.Orders AS Target
+    USING LatestTempOrders AS Source
+        ON Target.OrderID = Source.OrderID
+
+    -- Update existing records if the temp record is more recent
     WHEN MATCHED AND ISNULL(Source.UpdatedDate, '1900-01-01') > ISNULL(Target.UpdatedDate, '1900-01-01') THEN
         UPDATE SET
-            Target.CustomerID = Source.CustomerID,
-            Target.OrderDate = Source.OrderDate,
+            Target.CustomerID  = Source.CustomerID,
+            Target.OrderDate   = Source.OrderDate,
             Target.UpdatedDate = Source.UpdatedDate,
-            Target.Amount = Source.Amount
+            Target.Amount      = Source.Amount
 
+    -- Insert new records that don't exist in the target
     WHEN NOT MATCHED BY TARGET THEN
         INSERT (OrderID, CustomerID, OrderDate, UpdatedDate, Amount)
         VALUES (Source.OrderID, Source.CustomerID, Source.OrderDate, Source.UpdatedDate, Source.Amount);
+
 END;
+
+select * from dbo.Orders;
+
+select * from dbo.temp_Orders;
+
