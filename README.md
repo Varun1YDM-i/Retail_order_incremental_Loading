@@ -19,7 +19,7 @@ This project delivers a real-time data pipeline using Azure Data Factory (ADF) a
 ---
 
 ## 🏗️ Architecture
-
+![Logical data ingestion pipeline](https://github.com/Varun1YDM-i/Retail_order_incremental_Loading/blob/main/Azure%20Data%20Factory/logical_pipeline.drawio.png)
 ### 🔹 Ingestion: Copy Data from API to Staging  
 - Source: REST API (JSON) hosted on GitHub  
 - Sink: `TempOrders` staging table in Azure SQL  
@@ -60,7 +60,7 @@ This project delivers a real-time data pipeline using Azure Data Factory (ADF) a
 ---
 
 ## ▶️ How to Run It
-
+![Azure Data Factory pipeline](https://github.com/Varun1YDM-i/Retail_order_incremental_Loading/blob/main/Azure%20Data%20Factory/ADF_PIPELINE.png)
 1. Set up Azure SQL Database & create:
    - `TempOrders` (staging table)
    - `OrderTable` (final table with PK)
