@@ -1,0 +1,18 @@
+{
+    "name": "Json_order",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "githun_order_link",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "Json",
+        "typeProperties": {
+            "location": {
+                "type": "HttpServerLocation",
+                "relativeUrl": "/manish040596/adf_projects/refs/heads/main/orders.json"
+            }
+        },
+        "schema": {}
+    }
+}

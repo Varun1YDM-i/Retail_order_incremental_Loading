@@ -1,0 +1,45 @@
+CREATE TABLE dbo.Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID NVARCHAR(50),
+    OrderDate DATETIME,
+    UpdatedDate DATETIME,
+    Amount FLOAT
+);
+select * from dbo.Orders;
+CREATE TABLE dbo.temp_Orders (
+    OrderID INT ,
+    CustomerID NVARCHAR(50),
+    OrderDate DATETIME,
+    UpdatedDate DATETIME,
+    Amount FLOAT
+);
+
+select * from dbo.temp_Orders;
+
+ALTER PROCEDURE sp_upsert_orders
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Get latest UpdatedDate per OrderID
+    WITH RankedOrders AS (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY OrderID ORDER BY UpdatedDate DESC) AS rn
+        FROM dbo.temp_Orders
+    )
+    
+    MERGE dbo.Orders AS Target
+    USING (SELECT * FROM RankedOrders WHERE rn = 1) AS Source
+    ON Target.OrderID = Source.OrderID
+
+    WHEN MATCHED AND ISNULL(Source.UpdatedDate, '1900-01-01') > ISNULL(Target.UpdatedDate, '1900-01-01') THEN
+        UPDATE SET
+            Target.CustomerID = Source.CustomerID,
+            Target.OrderDate = Source.OrderDate,
+            Target.UpdatedDate = Source.UpdatedDate,
+            Target.Amount = Source.Amount
+
+    WHEN NOT MATCHED BY TARGET THEN
+        INSERT (OrderID, CustomerID, OrderDate, UpdatedDate, Amount)
+        VALUES (Source.OrderID, Source.CustomerID, Source.OrderDate, Source.UpdatedDate, Source.Amount);
+END;

@@ -1,0 +1,24 @@
+{
+    "name": "Schedule_Daily",
+    "properties": {
+        "annotations": [],
+        "runtimeState": "Started",
+        "pipelines": [
+            {
+                "pipelineReference": {
+                    "referenceName": "Orders_Incremental_pipeline",
+                    "type": "PipelineReference"
+                }
+            }
+        ],
+        "type": "ScheduleTrigger",
+        "typeProperties": {
+            "recurrence": {
+                "frequency": "Day",
+                "interval": 1,
+                "startTime": "2025-06-24T06:00:00",
+                "timeZone": "India Standard Time"
+            }
+        }
+    }
+}
