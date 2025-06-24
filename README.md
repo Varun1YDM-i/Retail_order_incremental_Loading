@@ -9,12 +9,12 @@ This project delivers a real-time data pipeline using Azure Data Factory (ADF) a
 
 ---
 
-## 🧠 What This Project Solves
+##  What This Project Solves
 
-> ✅ Incrementally Load only **new and updated orders** from an API  
-> ✅ Load raw data to a **staging table** (TempOrders)  
-> ✅ Use a **stored procedure with SQL MERGE** to upsert data  
-> ✅ Keep the final OrderTable **clean, current, and client-ready**
+ ✅ Incrementally Load only **new and updated orders** from an API  
+ ✅ Load raw data to a **staging table** (TempOrders)  
+ ✅ Use a **stored procedure with SQL MERGE** to upsert data  
+ ✅ Keep the final OrderTable **clean, current, and client-ready**
 
 ---
 
@@ -36,6 +36,7 @@ This project delivers a real-time data pipeline using Azure Data Factory (ADF) a
 ## 🛠️ Azure Services Used
 - Azure Data Factory (v2)
 - Azure SQL Database
+- Azure SQL Server
 
 ---
 
